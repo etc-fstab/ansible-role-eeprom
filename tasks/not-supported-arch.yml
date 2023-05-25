@@ -2,5 +2,5 @@
 - name: Not supported architecture
   ansible.builtin.debug:
     msg:
-      - "{{ ansible_architecture }} is not architecture."
+      - "{{ ansible_architecture }} is not supported architecture."
 ...
