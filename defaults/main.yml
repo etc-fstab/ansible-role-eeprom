@@ -1,0 +1,4 @@
+---
+# defaults
+eeprom_cmd: "/usr/sbin/eeprom"
+...

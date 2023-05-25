@@ -1,0 +1,20 @@
+---
+- name: Gather facts
+  ansible.builtin.setup:
+    gather_subset:
+      - 'min'
+
+- name: Not supported distro
+  when: ansible_facts['distribution'] != "Solaris"
+  ansible.builtin.include_tasks: not-supported-distro.yml
+
+- name: Not supported architecture
+  when: ansible_facts['architecture'] != "sun4v"
+  ansible.builtin.include_tasks: not-supported-arch.yml
+
+- name: Solaris SPARC is supported
+  when:
+    ansible_facts['distribution'] == "Solaris" and
+    ansible_facts['architecture'] == "sun4v"
+  ansible.builtin.include_tasks: solaris.yml
+...

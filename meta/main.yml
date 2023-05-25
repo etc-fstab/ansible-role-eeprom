@@ -1,0 +1,23 @@
+galaxy_info:
+  role_name: ansible_role_eeprom
+  namespace: etc_fstab
+  author: zd
+  description: Management of EEPROM on SPARC Solaris 10-11
+
+  license: "Public Domain"
+
+  min_ansible_version: 2.10.7
+
+  platforms:
+    - name: Solaris
+      versions:
+        - all
+
+  galaxy_tags:
+    - system
+    - sparc
+    - sun4v
+    - tools
+    - solaris
+
+dependencies: []

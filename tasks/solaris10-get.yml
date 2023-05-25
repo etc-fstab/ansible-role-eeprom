@@ -1,0 +1,10 @@
+---
+- name: Get S10 current eepro param values
+  ansible.builtin.shell:
+    "(set -e; \
+    {{ eeprom_cmd }} {{ item.param }} | awk -F\\= '{print $2}')"
+  changed_when: false
+  check_mode: false
+  with_items: "{{ eeprom_parameters }}"
+  register: all_results
+...

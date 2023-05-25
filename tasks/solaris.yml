@@ -1,0 +1,88 @@
+---
+- name: Load distro vars
+  ansible.builtin.include_vars:
+    "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+      paths:
+        - "vars"
+
+- name: Include Solaris10 task to get params
+  when:
+    ansible_facts['distribution'] == "Solaris" and
+    ansible_facts['distribution_major_version'] == "10"
+  ansible.builtin.include_tasks: solaris10-get.yml
+
+- name: Include Solaris11 task to get params
+  when:
+    ansible_facts['distribution'] == "Solaris" and
+    ansible_facts['distribution_major_version'] == "11"
+  ansible.builtin.include_tasks: solaris11-get.yml
+
+- name: Set list of param indexes
+  ansible.builtin.set_fact:
+    l_index: "{{ range(all_results.results | length) }}"
+
+- name: Compute current param values
+  ansible.builtin.debug:
+    msg:
+      # - "{{ all_results | dict2items }}"  # list of dict, for each param
+      # - "{{ (all_results | dict2items)[0] }}"  # dict, for each param
+      # - "{{ (all_results | dict2items)[0][\"value\"] }}"  # list, for each param
+      # - "{{ ((all_results | dict2items)[0][\"value\"])[index] }}"  # dict, for each param
+      # - "{{ ((all_results | dict2items)[0][\"value\"])[index][\"stdout_lines\"] | type_debug }}"  # list
+      - "{{ ((all_results | dict2items)[0][\"value\"])[index][\"stdout_lines\"] }}"
+  loop: "{{ l_index }}"  # loop through list indexes
+  loop_control:
+    index_var: index
+
+- name: Declare list for current param values
+  ansible.builtin.set_fact:
+    birth_current_param_value_list: []
+
+- name: Add current param values to the list
+  ansible.builtin.set_fact:
+    birth_current_param_value_list:
+      "{{ birth_current_param_value_list + \
+      (((all_results | dict2items)[0][\"value\"])[index][\"stdout_lines\"]) }}"
+  loop: "{{ l_index }}"
+  loop_control:
+    index_var: index
+
+- name: Set final list of current param values
+  ansible.builtin.set_fact:
+    current_param_value_list: "{{ birth_current_param_value_list }}"
+
+- name: Set list of desired param values
+  ansible.builtin.set_fact:
+    desired_param_value_list: "{{ eeprom_parameters | map(attribute='param_value') | list }}"
+
+- name: Print current and desired param values list
+  ansible.builtin.debug:
+    msg:
+      - "Current param values: {{ current_param_value_list }}"
+      - "Desired param values: {{ desired_param_value_list }}"
+
+- name: Detect and report changes
+  when: desired_param_value_list != current_param_value_list
+  ansible.builtin.debug:
+    msg:
+      - "Current and desired values differ, prepare for change."
+  changed_when: true
+
+- name: Include Solaris10 task to set params
+  when:
+    ansible_facts['distribution'] == "Solaris" and
+    ansible_facts['distribution_major_version'] == "10" and
+    desired_param_value_list != current_param_value_list
+  ansible.builtin.include_tasks: solaris10-set.yml
+
+- name: Include Solaris11 task to set params
+  when:
+    ansible_facts['distribution'] == "Solaris" and
+    ansible_facts['distribution_major_version'] == "11" and
+    desired_param_value_list != current_param_value_list
+  ansible.builtin.include_tasks: solaris11-set.yml
+...

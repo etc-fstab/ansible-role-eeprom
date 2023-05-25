@@ -1,0 +1,6 @@
+---
+- name: Test eeprom role
+  hosts: test
+  roles:
+    - role: ../../ansible-role-eeprom
+...

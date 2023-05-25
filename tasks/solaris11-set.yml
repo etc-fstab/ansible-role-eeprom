@@ -1,0 +1,8 @@
+---
+- name: Set S11 param values to desired
+  when: desired_param_value_list != current_param_value_list
+  ansible.builtin.shell:
+    "set -o pipefail && \
+    {{ eeprom_cmd }} {{ item.param }}={{ item.param_value }}"
+  with_items: "{{ eeprom_parameters }}"
+...

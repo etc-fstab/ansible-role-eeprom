@@ -1,0 +1,8 @@
+---
+# Solaris 10 eepro parameters
+# Make it to fit your needs.
+eeprom_parameters:
+  - { param: "auto-boot?", param_value: "true" }
+  - { param: "diag-switch?", param_value: "false" }
+  - { param: "use-nvramrc?", param_value: "true" }
+...

@@ -1,0 +1,6 @@
+---
+- name: Not supported distro
+  ansible.builtin.debug:
+    msg:
+      - "{{ ansible_distribution }} is not supported."
+...
